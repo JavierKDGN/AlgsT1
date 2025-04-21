@@ -9,3 +9,6 @@ double calculateDistance(const Point &p1, const Point &p2);
 
 double distanciaMinimaBruta(const Plano &S);
 
+double distanciaMinimaDC(const Plano &S);
+
+double distanciaMinimaDCRecursiva(const Plano &px, const Plano &py);

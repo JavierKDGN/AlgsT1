@@ -1,4 +1,6 @@
 #include "algoritmos.h"
+
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -23,11 +25,87 @@ double distanciaMinimaBruta(const Plano &S) {
     for (int i = 0; i < S.size(); i++) {
         for (int j = i + 1; j < S.size(); j++) {
             double d = calculateDistance(S[i], S[j]);
-            if (d < dist_min) {
-                dist_min = d;
-            }
+            dist_min = std::min(d, dist_min);
         }
     }
 
     return dist_min;
+}
+
+// Funcion para preparar la busqueda, primero ordenamos el plano por sus ejes
+double distanciaMinimaDC(const Plano &S) {
+    Plano px = S;
+    Plano py = S;
+
+    // Sorteamos px por coord x
+    std::sort(px.begin(), px.end(), [](const Point& a, const Point& b) {
+        if (a.first != b.first) {
+            return a.first < b.first;
+        }
+        return a.second < b.second;
+    });
+
+    // Sorteamos py por coord y
+    std::sort(py.begin(), py.end(), [](const Point& a, const Point& b) {
+        if (a.second != b.second) {
+            return a.second < b.second;
+        }
+        return a.first < b.first;
+    });
+
+    return distanciaMinimaDCRecursiva(px,py);
+}
+
+double distanciaMinimaDCRecursiva(const Plano &px, const Plano &py) {
+    int n = px.size();
+
+    // Caso base: Si el plano es muy chico, usamos fuerza bruta
+    if (n <= 3) {
+        return distanciaMinimaBruta(px);
+    }
+
+    // Dividimos el plano en 2
+    int mediana = n / 2;
+    Point punto_medio = px[mediana - 1];
+    double x_linea_media = punto_medio.first;
+
+    // Declaramos las mitades
+    Plano px_l(px.begin(), px.begin() + mediana);
+    Plano px_r(px.begin() + mediana, px.end());
+
+    // Lo mismo pero ordenados en y
+    Plano py_l, py_r;
+    for (const auto &p : py) {
+        // Puntos a la izquierda o en la linea se van a py_l
+        if (p.first <= x_linea_media) {
+            py_l.push_back(p);
+        } else {
+            py_r.push_back(p);
+        }
+    }
+
+    // Conquistamos
+    double delta_l = distanciaMinimaDCRecursiva(px_l, py_l);
+    double delta_r = distanciaMinimaDCRecursiva(px_r, py_r);
+    double delta = std::min(delta_l, delta_r);
+
+    // Combinamos
+    // Buscamos en el strip (puntos dentro del delta de x_linea_media)
+    Plano strip_y;
+
+    for (const auto&p : py) {
+        if (std::abs(p.first - x_linea_media) < delta) {
+            strip_y.push_back(p);
+        }
+    }
+
+    double min_strip_dist = delta;
+    for (int i = 0; i < strip_y.size(); i++) {
+        for (int j = i + 1; j < strip_y.size() && (strip_y[j].second - strip_y[i].second < min_strip_dist); j++) {
+            double d = calculateDistance(strip_y[i], strip_y[j]);
+            min_strip_dist = std::min(min_strip_dist, d);
+        }
+    }
+
+    return min_strip_dist;
 }
