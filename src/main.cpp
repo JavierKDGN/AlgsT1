@@ -4,6 +4,7 @@
 #include <utility>
 #include <cmath>
 #include <random>
+#include <set>
 
 #include "algoritmos.h"
 
@@ -37,11 +38,21 @@ void popularPlanoAleatorio(Plano &s, const int n) {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1,100);
 
-    for (int i = 0; i < n; i++) {
-        double x = dist(gen);
-        double y = dist(gen);
-        s.emplace_back(x, y);
+    // No queremos entradas repetidas
+    std::set<Point> entradas;
+
+    while (s.size() < n) {
+        int x = dist(gen);
+        int y = dist(gen);
+        Point p(x,y);
+
+        // Insercion correcta
+        if (entradas.insert(p).second) {
+            s.push_back(p);
+        }
     }
+
+
 }
 
 void printPlano(const Plano &S) {
@@ -53,7 +64,7 @@ void printPlano(const Plano &S) {
 int main() {
 
     Plano plano;
-    popularPlanoAleatorio(plano, 256);
+    popularPlanoAleatorio(plano, 64);
     printPlano(plano);
 
     std::cout << "\n Distancia minima:" << "\n";
