@@ -1,12 +1,60 @@
 #include "algoritmos.h"
-
+#include <utility>
+#include <cmath>
+#include <random>
+#include <set>
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 // Funcion incluida en la tarea
 double calculateDistance(const Point &p1, const Point &p2) {
     return sqrt(pow(p1.first - p2.first, 2) + pow(p1.second - p2.second, 2));
+}
+
+// LLena el Plano con (x_i,y_i) i = 1,...,n
+// ayuda de LLM
+void popularPlano(Plano &s, const int n) {
+    s.clear();
+    int side = static_cast<int>(std::ceil(std::sqrt(n)));
+    int count = 0;
+    for (int i = 1; i < side + 1 && count < n; ++i) {
+        for (int j = 1; j < side + 1 && count < n; ++j) {
+            s.emplace_back(i, j);
+            ++count;
+        }
+    }
+}
+
+void popularPlanoAleatorio(Plano &s, const int n) {
+    s.clear();
+    // RNG
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1,100);
+
+    // No queremos entradas repetidas
+    std::set<Point> entradas;
+
+    while (s.size() < n) {
+        int x = dist(gen);
+        int y = dist(gen);
+        Point p(x,y);
+
+        // Insercion correcta
+        if (entradas.insert(p).second) {
+            s.push_back(p);
+        }
+    }
+
+
+}
+
+void printPlano(const Plano &S) {
+    for (auto & i : S) {
+        std::cout << '(' << i.first << ',' << i.second << ')' << std::endl;
+    }
 }
 
 /*

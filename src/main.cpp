@@ -1,10 +1,6 @@
-#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <utility>
-#include <cmath>
-#include <random>
-#include <set>
+
 
 #include "algoritmos.h"
 
@@ -16,50 +12,6 @@
 
 // Point = Par x,y (typedef pair<double,double>)
 // Plano = 'S' conjunto de puntos (typedef vector<point>)
-
-// LLena el Plano con (x_i,y_i) i = 1,...,n
-// ayuda de LLM
-void popularPlano(Plano &s, const int n) {
-    s.clear();
-    int side = static_cast<int>(std::ceil(std::sqrt(n)));
-    int count = 0;
-    for (int i = 1; i < side + 1 && count < n; ++i) {
-        for (int j = 1; j < side + 1 && count < n; ++j) {
-            s.emplace_back(i, j);
-            ++count;
-        }
-    }
-}
-
-void popularPlanoAleatorio(Plano &s, const int n) {
-    s.clear();
-    // RNG
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1,100);
-
-    // No queremos entradas repetidas
-    std::set<Point> entradas;
-
-    while (s.size() < n) {
-        int x = dist(gen);
-        int y = dist(gen);
-        Point p(x,y);
-
-        // Insercion correcta
-        if (entradas.insert(p).second) {
-            s.push_back(p);
-        }
-    }
-
-
-}
-
-void printPlano(const Plano &S) {
-    for (auto & i : S) {
-        std::cout << '(' << i.first << ',' << i.second << ')' << std::endl;
-    }
-}
 
 int main() {
 
